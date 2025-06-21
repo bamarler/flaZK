@@ -1,0 +1,57 @@
+zkAge Threshold Verifier — Project Overview
+===========================================
+
+What We Have Built
+------------------
+This project is a proof-of-concept (POC) zero-knowledge circuit system that allows a user to prove, in zero-knowledge, that their private age is greater than or equal to a public threshold (e.g., 18), without revealing their actual age. This is inspired by privacy-preserving age verification needs for online services.
+
+Key Features
+------------
+- **Zero-Knowledge Proof (ZKP):** Proves age >= threshold without leaking the actual age.
+- **Minimal Circom Circuit:** Uses an 8-bit comparator for hackathon/demo speed and simplicity.
+- **Automated Workflow:** Includes scripts for compiling, trusted setup, witness/proof generation, and verification.
+- **Hackathon-Ready:** Fast to demo, easy to understand, and extensible for future upgrades.
+
+How the Proof Works
+-------------------
+1. **Inputs:**
+   - `age` (private input): The user's real age.
+   - `threshold` (public input): The age to check against (e.g., 18).
+2. **Circuit Logic:**
+   - The circuit checks if `age >= threshold` using arithmetic constraints only (no direct comparisons).
+   - Outputs `isOver = 1` if true, else `0`.
+3. **Proof Generation:**
+   - The user generates a witness and a zk-SNARK proof that their age meets the threshold.
+   - The proof and public inputs can be sent to any verifier (e.g., a website or smart contract).
+4. **Verification:**
+   - Anyone can verify the proof using the public threshold and the proof, without learning the user's actual age.
+
+Project Structure
+-----------------
+- `AgeCheck.circom` — The main circuit file.
+- `input.json` — Example input for generating proofs.
+- `compile.sh` — Compiles the circuit.
+- `setup.sh` — Automates trusted setup (Powers of Tau + Groth16).
+- `prove_and_verify.sh` — Automates witness/proof generation and verification.
+- `build/` — Contains all generated files (wasm, r1cs, zkey, etc.).
+
+How to Use
+----------
+1. Compile the circuit: `bash compile.sh`
+2. Run trusted setup: `bash setup.sh`
+3. Prepare your input in `input.json`
+4. Run the full proof flow: `bash prove_and_verify.sh`
+
+What the Proof Demonstrates
+---------------------------
+- The user can prove they meet an age threshold (e.g., 18+) without revealing their actual age.
+- The verifier learns only that the user is old enough, not the user's age.
+
+Future Upgrades (Possible)
+--------------------------
+- Use birthdate instead of age
+- Add hash-committed or signed attributes
+- Export Solidity verifier for on-chain use
+- Support more complex attributes (e.g., licenses)
+
+This project is a minimal, privacy-preserving age verification demo ready for hackathons and rapid prototyping.
