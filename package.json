@@ -14,12 +14,19 @@
     "dev:mocks": "cross-env VITE_USE_MOCKS=true npm run --prefix apps/widget dev",
     "dev:full": "cross-env VITE_USE_MOCKS=false npm-run-all --parallel dev:api dev:widget",
     "dev:api": "npm run --prefix apps/api dev",
-    "dev:widget": "cross-env VITE_USE_MOCKS=false npm run --prefix apps/widget dev"
+    "dev:widget": "cross-env VITE_USE_MOCKS=false npm run --prefix apps/widget dev",
+    "dev:demo": "npm-run-all --sequential demo:build --parallel demo:api demo:servers --sequential demo:wait demo:open",
+    "demo:build": "cross-env VITE_USE_MOCKS=false npm run --prefix apps/widget build",
+    "demo:api": "npm run --prefix apps/api dev",
+    "demo:servers": "node demo/server.js",
+    "demo:wait": "node -e \"setTimeout(() => console.log('Services ready!'), 2000)\"",
+    "demo:open": "node -e \"require('child_process').exec(process.platform === 'darwin' ? 'open http://localhost:8080' : process.platform === 'win32' ? 'start http://localhost:8080' : 'xdg-open http://localhost:8080')\""
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.2.0",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "express": "^4.18.2"
   }
 }

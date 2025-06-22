@@ -24,17 +24,8 @@ export function App() {
     const request = verificationService.parseVerificationRequest(params);
     setVerificationRequest(request);
     
-    // Check if user is already logged in
-    checkExistingSession();
+    setCurrentStep('login');
   }, []);
-
-  const checkExistingSession = async () => {
-    const user = await authService.getCurrentUser();
-    if (user) {
-      setUserId(user.userId);
-      setCurrentStep('scan');
-    }
-  };
 
   const handleLogin = async (loggedInUserId: string) => {
     setUserId(loggedInUserId);

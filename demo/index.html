@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACME Car Rentals - Enterprise Vehicle Solutions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: normal;
+            letter-spacing: 2px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 2rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-weight: normal;
+            text-align: center;
+        }
+
+        .section {
+            background: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #ddd;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            color: #34495e;
+            margin-bottom: 1rem;
+            font-weight: normal;
+        }
+
+        .requirements-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        .requirements-table th,
+        .requirements-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .requirements-table th {
+            background: #f8f8f8;
+            font-weight: normal;
+            color: #555;
+        }
+
+        .verify-section {
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        .verify-btn {
+            background: #9333ea;
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: Arial, sans-serif;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
+            font-weight: 500;
+        }
+
+        .verify-btn:hover {
+            background: #a855f7;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
+        }
+
+        .verify-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .disclaimer {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 1rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.4;
+        }
+
+        .disclaimer a {
+            color: #9333ea;
+            text-decoration: none;
+        }
+
+        .status {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-left: 4px solid #ddd;
+            display: none;
+            background: #f9f9f9;
+            text-align: left;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .status.success {
+            border-left-color: #27ae60;
+            background: #f0f8f4;
+        }
+
+        .status.error {
+            border-left-color: #c0392b;
+            background: #fdf5f5;
+        }
+
+        .status.loading {
+            border-left-color: #3498db;
+            background: #e3f2fd;
+            display: block;
+        }
+
+        .status.pending {
+            border-left-color: #f39c12;
+            background: #fef9e7;
+            display: block;
+        }
+
+        footer {
+            background: #34495e;
+            color: #95a5a6;
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="logo">ACME CAR RENTALS</h1>
+            <nav>
+                <a href="#">Fleet</a>
+                <a href="#">Locations</a>
+                <a href="#">Corporate</a>
+                <a href="#">Contact</a>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <h2 class="page-title">Vehicle Rental Verification</h2>
+        
+        <div class="section">
+            <h3 class="section-title">Rental Requirements</h3>
+            
+            <table class="requirements-table">
+                <thead>
+                    <tr>
+                        <th>Requirement</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Driver Age</td>
+                        <td>Must be 25 years or older</td>
+                    </tr>
+                    <tr>
+                        <td>License Status</td>
+                        <td>Valid driver's license required</td>
+                    </tr>
+                    <tr>
+                        <td>Driving Record</td>
+                        <td>Maximum 6 points on record</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="verify-section">
+                <button class="verify-btn" id="verify-btn">
+                    Verify with flaZK
+                </button>
+                
+                <p class="disclaimer">
+                    <a href="#">Why flaZK?</a> We use zero-knowledge verification to confirm your eligibility without accessing or storing your personal documents.
+                </p>
+                
+                <div class="status" id="status"></div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 ACME Car Rentals, Inc. All rights reserved.</p>
+    </footer>
+    
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

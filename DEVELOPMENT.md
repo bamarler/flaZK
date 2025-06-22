@@ -2,18 +2,15 @@
 
 ## Quick Start
 
-### 🎭 Mock Development (Recommended for UI work)
+### Demo
 
 ```bash
-npm run dev:mocks
+npm run dev:demo
 ```
 
-- Uses mock data
-- No backend required
-- Fastest startup
-- Perfect for UI/UX development
+- Runs the API and simple demo site to request proof
 
-### 🚀 Full Stack Development
+### Full Stack Development
 
 ```bash
 npm run dev:full
@@ -24,7 +21,18 @@ npm run dev:full
 - Uses local file storage
 - Includes pre-seeded test data
 
-### 🔧 API Only
+### Mock Development (Recommended for UI work)
+
+```bash
+npm run dev:mocks
+```
+
+- Uses mock data
+- No backend required
+- Fastest startup
+- Perfect for UI/UX development
+
+### API Only
 
 ```bash
 npm run dev:api
@@ -33,7 +41,7 @@ npm run dev:api
 - Just the backend
 - Access at http://localhost:3001
 
-### 🌐 Widget with API
+### Widget with API
 
 ```bash
 # Terminal 1
@@ -66,11 +74,11 @@ The API comes with pre-seeded test users and documents:
 
 - **Phone**: +15555551234 (Has all documents)
 - **Phone**: +15555552345 (Missing driving record)
-- **Phone**: +15555553456 (Missing license and points)
+- **Phone**: +15555553456 (Missing license and driving record)
 
 ### Verification Code
 
-- All test users accept code: `123456`
+- All test users accept code: `123456` and `766429`
 
 ## Development Scenarios
 

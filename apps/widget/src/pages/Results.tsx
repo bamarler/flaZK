@@ -1,4 +1,3 @@
-// pages/Results.tsx
 import { useEffect } from 'react';
 import { CheckCircle, Shield } from 'lucide-react';
 import { proofService } from '../services';
@@ -65,7 +64,7 @@ export function Results({ proof, request }: ResultsProps) {
         </p>
         {isValid && (
           <p className="text-sm text-green-600 font-medium">
-            ✓ You may now continue with your verification
+            ✓ Verification complete
           </p>
         )}
       </div>

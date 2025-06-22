@@ -1,6 +1,6 @@
-// services/document-scanner.service.ts
 import type { UserDocument } from '../types';
 import { getCurrentScenario } from '../mocks/scenarios';
+import { config } from '../config';
 
 export interface ScanResult {
   age: boolean;
@@ -22,12 +22,10 @@ export interface DocumentScannerService {
 
 class MockDocumentScannerService implements DocumentScannerService {
   async scanUserDocuments(userId: string, requirements: any): Promise<ScanResult> {
-    // Simulate scanning time
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     const scenario = getCurrentScenario();
     
-    // Return results based on scenario
     switch (scenario) {
       case 'all-docs':
         return {
@@ -40,14 +38,14 @@ class MockDocumentScannerService implements DocumentScannerService {
         return {
           age: true,
           license_status: true,
-          points: false  // Missing driving points
+          points: false
         };
       
       case 'missing-two':
         return {
           age: true,
-          license_status: false,  // Missing license status/expiry
-          points: false  // Missing driving points
+          license_status: false,
+          points: false
         };
       
       default:
@@ -60,10 +58,8 @@ class MockDocumentScannerService implements DocumentScannerService {
   }
 
   async extractDataFromDocuments(documents: UserDocument[]): Promise<ExtractedData> {
-    // Simulate extraction time
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // Extract data from all documents
     let age = 0;
     let license_status = 0;
     let points = 0;
@@ -88,27 +84,22 @@ class MockDocumentScannerService implements DocumentScannerService {
   }
 
   async analyzeUploadedDocument(file: File): Promise<Partial<ExtractedData>> {
-    // Simulate AI analysis time
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     const scenario = getCurrentScenario();
     const fileName = file.name.toLowerCase();
     const result: Partial<ExtractedData> = {};
     
-    // Analyze based on file name and scenario
     if (scenario === 'missing-one') {
-      // Only missing driving points
       if (fileName.includes('record') || fileName.includes('dmv') || fileName.includes('driving')) {
         result.points = 3;
       }
     } else if (scenario === 'missing-two') {
-      // Missing both license status and driving points
       if (fileName.includes('license')) {
         result.license_status = 1;
       } else if (fileName.includes('record') || fileName.includes('dmv')) {
         result.points = 4;
       } else if (fileName.includes('combined') || fileName.includes('both')) {
-        // Document contains both
         result.license_status = 1;
         result.points = 2;
       }
@@ -118,4 +109,88 @@ class MockDocumentScannerService implements DocumentScannerService {
   }
 }
 
-export const documentScannerService: DocumentScannerService = new MockDocumentScannerService();
+class ApiDocumentScannerService implements DocumentScannerService {
+  async scanUserDocuments(userId: string, requirements: any): Promise<ScanResult> {
+    const token = localStorage.getItem('authToken');
+    const sessionId = new URLSearchParams(window.location.search).get('session');
+    
+    const headers: any = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+    
+    if (sessionId) {
+      headers['X-Session-ID'] = sessionId;
+    }
+    
+    const response = await fetch(`${config.API_URL}/api/documents/scan`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ userId, requirements })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to scan documents');
+    }
+
+    return response.json();
+  }
+
+  async extractDataFromDocuments(documents: UserDocument[]): Promise<ExtractedData> {
+    const token = localStorage.getItem('authToken');
+    const sessionId = new URLSearchParams(window.location.search).get('session');
+    
+    const headers: any = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+    
+    if (sessionId) {
+      headers['X-Session-ID'] = sessionId;
+    }
+    
+    const response = await fetch(`${config.API_URL}/api/documents/extract`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ documents })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to extract data');
+    }
+
+    return response.json();
+  }
+
+  async analyzeUploadedDocument(file: File): Promise<Partial<ExtractedData>> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const token = localStorage.getItem('authToken');
+    const sessionId = new URLSearchParams(window.location.search).get('session');
+    
+    const headers: any = {
+      'Authorization': `Bearer ${token}`
+    };
+    
+    if (sessionId) {
+      headers['X-Session-ID'] = sessionId;
+    }
+    
+    const response = await fetch(`${config.API_URL}/api/documents/analyze`, {
+      method: 'POST',
+      headers,
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to analyze document');
+    }
+
+    return response.json();
+  }
+}
+
+export const documentScannerService: DocumentScannerService = config.useMocks 
+  ? new MockDocumentScannerService() 
+  : new ApiDocumentScannerService();

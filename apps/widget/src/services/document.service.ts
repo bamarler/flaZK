@@ -1,6 +1,6 @@
-// services/document.service.ts
 import type { UserDocument } from '../types';
 import { getScenarioDocuments } from '../mocks/scenarios';
+import { config } from '../config';
 
 export interface DocumentService {
   getUserDocuments(userId: string): Promise<UserDocument[]>;
@@ -15,8 +15,6 @@ class MockDocumentService implements DocumentService {
 
   async getUserDocuments(userId: string) {
     await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Return documents based on current scenario
     return getScenarioDocuments();
   }
 
@@ -33,19 +31,16 @@ class MockDocumentService implements DocumentService {
   }
 
   async saveDocument(file: File, userId: string, saveToAccount: boolean): Promise<UserDocument> {
-    // Create document object
     const document: UserDocument = {
       id: `doc-${Date.now()}`,
       type: 'uploaded_document',
       name: file.name,
       uploadedAt: new Date(),
-      fields: {} // Fields will be populated by scanner service
+      fields: {}
     };
 
-    // Add to temporary storage
     this.addToTemporary(document);
 
-    // If saveToAccount is true, would also save to permanent storage
     if (saveToAccount) {
       console.log(`Mock: Saving document ${document.id} to user ${userId} permanent storage`);
     }
@@ -54,4 +49,71 @@ class MockDocumentService implements DocumentService {
   }
 }
 
-export const documentService: DocumentService = new MockDocumentService();
+class ApiDocumentService implements DocumentService {
+  private temporaryStorage: UserDocument[] = [];
+
+  async getUserDocuments(userId: string): Promise<UserDocument[]> {
+    const token = localStorage.getItem('authToken');
+    
+    const response = await fetch(`${config.API_URL}/api/documents/user/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      return [];
+    }
+
+    return response.json();
+  }
+
+  getTemporaryDocuments(): UserDocument[] {
+    return this.temporaryStorage;
+  }
+
+  addToTemporary(document: UserDocument): void {
+    this.temporaryStorage.push(document);
+  }
+
+  clearTemporary(): void {
+    this.temporaryStorage = [];
+  }
+
+  async saveDocument(file: File, userId: string, saveToAccount: boolean): Promise<UserDocument> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('userId', userId);
+    formData.append('saveToAccount', saveToAccount.toString());
+
+    const token = localStorage.getItem('authToken');
+    const sessionId = new URLSearchParams(window.location.search).get('session');
+    
+    const headers: any = {
+      'Authorization': `Bearer ${token}`
+    };
+    
+    if (sessionId) {
+      headers['X-Session-ID'] = sessionId;
+    }
+    
+    const response = await fetch(`${config.API_URL}/api/documents/upload`, {
+      method: 'POST',
+      headers,
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to upload document');
+    }
+
+    const document = await response.json();
+    this.addToTemporary(document);
+    
+    return document;
+  }
+}
+
+export const documentService: DocumentService = config.useMocks 
+  ? new MockDocumentService() 
+  : new ApiDocumentService();
