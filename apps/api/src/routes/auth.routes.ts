@@ -1,44 +1,50 @@
-// apps/api/src/routes/auth.routes.ts
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import { authMiddleware } from '../middleware/auth.middleware';
+import { db } from '../services/database.service';
 
 export const authRouter = Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
 
-// Public endpoint - no auth required
-authRouter.post('/send-code', async (req, res) => {
+authRouter.post('/send-code', async (req, res): Promise<void> => {
   const { phone } = req.body;
-  phone
-  // Send SMS logic
+  
+  if (!phone) {
+    res.status(400).json({ error: 'Phone number required' });
+    return;
+  }
+  
+  console.log(`Sending SMS code to ${phone}`);
   res.json({ success: true });
 });
 
-// Public endpoint - returns JWT
-authRouter.post('/verify-code', async (req, res) => {
+authRouter.post('/verify-code', async (req, res): Promise<void> => {
   const { phone, code } = req.body;
   
-  // Verify SMS code
-  if (code !== '123456' && code !== '766429') {
-    return res.status(401).json({ error: 'Invalid code' });
+  if (code !== '766329' && code !== '823945') {
+    res.status(401).json({ error: 'Invalid code' });
+    return;
   }
   
-  // Create JWT token
+  let user = await db.getUser(phone);
+  if (!user) {
+    user = await db.createUser(phone);
+  }
+  
   const token = jwt.sign(
-    { userId: 'user-123', phone },
+    { userId: phone, phone },
     JWT_SECRET,
     { expiresIn: '24h' }
   );
   
-  return res.json({ 
+  res.json({ 
     success: true, 
-    userId: 'user-123', 
+    userId: phone, 
     token 
   });
 });
 
-// Protected endpoint - requires JWT
-authRouter.get('/me', authMiddleware.validateJWT, async (req, res) => {
+authRouter.get('/me', authMiddleware.validateJWT, async (req, res): Promise<void> => {
   res.json(req.user);
 });

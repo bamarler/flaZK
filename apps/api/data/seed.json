@@ -1,0 +1,42 @@
+{
+  "users": [
+    {
+      "phone": "+15555551234",
+      "documentIds": ["doc-1", "doc-2"]
+    },
+    {
+      "phone": "+15555552345",
+      "documentIds": []
+    },
+    {
+      "phone": "+15555553456",
+      "documentIds": []
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc-1",
+      "type": "drivers_license",
+      "name": "Driver License - User 1",
+      "uploadedAt": "2024-01-15T10:00:00Z",
+      "fields": {
+        "birthdate": "1998-03-15",
+        "license_status": "valid",
+        "license_expiry": "2028-03-15",
+        "license_number": "D12345678"
+      }
+    },
+    {
+      "id": "doc-2",
+      "type": "driving_record",
+      "name": "DMV Driving Record - User 1",
+      "uploadedAt": "2024-01-15T10:05:00Z",
+      "fields": {
+        "driving_points": 0,
+        "violations": [],
+        "record_date": "2024-01-10"
+      }
+    }
+  ],
+  "sessions": []
+}

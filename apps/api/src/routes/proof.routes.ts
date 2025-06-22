@@ -24,13 +24,3 @@ proofRouter.post('/generate', async (req, res) => {
     
   res.json({ proof });
 });
-
-// Submit proof to client (not used in current flow)
-proofRouter.post('/submit', async (req, res) => {
-  const { proof, callbackUrl, sessionId } = req.body;
-  
-  console.log('Submitting proof:', { proof, callbackUrl, sessionId });
-  
-  // In production, would submit to client's callback URL
-  res.json({ success: true });
-});

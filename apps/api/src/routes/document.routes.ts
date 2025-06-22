@@ -1,131 +1,101 @@
 import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth.middleware';
 import { uploadMiddleware } from '../middleware/upload.middleware';
+import { db } from '../services/database.service';
+import { uploadService } from '../services/upload.service';
 
 export const documentRouter = Router();
 
-// All document routes require authentication
 documentRouter.use(authMiddleware.validateJWT);
 
-// Get user's documents
-documentRouter.get('/user/:userId', async (req, res) => {
-  if (req.params.userId !== req.user?.userId) {
-    return res.status(403).json({ error: 'Forbidden' });
+documentRouter.get('/user/:userId', async (req, res): Promise<void> => {
+  const phone = req.params.userId;
+  
+  if (phone !== req.user?.phone) {
+    res.status(403).json({ error: 'Forbidden' });
+    return;
   }
   
-  // In production, fetch from database
-  return res.json([
-    {
-      id: 'doc-1',
-      type: 'drivers_license',
-      name: 'Driver License',
-      uploadedAt: new Date(),
-      fields: {
-        birthdate: '1998-05-15',
-        license_status: 'valid',
-        license_expiry: '2026-05-15'
-      }
-    }
-  ]);
+  const documents = await db.getUserDocuments(phone);
+  res.json(documents);
 });
 
-// Scan documents for verification
-documentRouter.post('/scan', async (req, res) => {
+documentRouter.post('/scan', async (req, res): Promise<void> => {
   const { userId, requirements } = req.body;
   
-  console.log(`Scanning documents for user ${userId} with requirements:`, requirements);
+  const userData = await db.extractUserData(userId);
   
-  // In production, scan actual documents
-  res.json({ 
-    age: false, 
-    license_status: false, 
-    points: false
-  });
+  const results = {
+    age: requirements.age_min ? userData.age >= requirements.age_min : true,
+    license_status: requirements.license_status ? userData.license_status === requirements.license_status : true,
+    points: requirements.points_max !== undefined ? userData.points <= requirements.points_max : true
+  };
+  
+  res.json(results);
 });
 
-// Upload a new document
 documentRouter.post('/upload', 
   uploadMiddleware.single('file'), 
-  async (req, res) => {
+  async (req, res): Promise<void> => {
     if (!req.file) {
-      return res.status(400).json({ error: 'No file provided' });
+      res.status(400).json({ error: 'No file provided' });
+      return;
     }
     
-    const { userId, saveToAccount } = req.body;
+    const { userId } = req.body;
+    const phone = userId || req.user?.phone;
     
-    console.log(`Uploading document for user ${userId}, save to account: ${saveToAccount}`);
+    if (!phone) {
+      res.status(400).json({ error: 'User ID required' });
+      return;
+    }
     
-    // In production, save file and extract data
-    const document = {
-      id: `doc-${Date.now()}`,
-      type: 'uploaded_document',
-      name: req.file.originalname,
-      uploadedAt: new Date(),
-      fields: {}
-    };
+    const document = await uploadService.processAndSaveDocument(phone, req.file);
     
-    return res.json(document);
+    res.json(document);
 });
 
-// Verify document authenticity
 documentRouter.post('/verify', 
   uploadMiddleware.single('file'), 
-  async (req, res) => {
+  async (req, res): Promise<void> => {
     if (!req.file) {
-      return res.status(400).json({ error: 'No file provided' });
+      res.status(400).json({ error: 'No file provided' });
+      return;
     }
     
-    // In production, verify with government API
-    return res.json({ 
+    res.json({ 
       valid: true,
       documentId: `doc-${Date.now()}`
     });
 });
 
-// Analyze uploaded document
 documentRouter.post('/analyze',
   uploadMiddleware.single('file'),
-  async (req, res) => {
+  async (req, res): Promise<void> => {
     if (!req.file) {
-      return res.status(400).json({ error: 'No file provided' });
+      res.status(400).json({ error: 'No file provided' });
+      return;
     }
     
-    // In production, use AI/OCR to extract data
-    const fileName = req.file.originalname.toLowerCase();
-    const result: any = {};
-    
-    if (fileName.includes('license')) {
-      result.license_status = 1;
-    } else if (fileName.includes('record') || fileName.includes('dmv')) {
-      result.points = 3;
-    }
-    
-    return res.json(result);
+    const extractedData = await uploadService.extractDataFromFile(req.file);
+    res.json(extractedData);
 });
 
-// Extract data from multiple documents
-documentRouter.post('/extract', async (req, res) => {
+documentRouter.post('/extract', async (req, res): Promise<void> => {
   const { documents } = req.body;
   
-  // In production, extract data from provided documents
-  let age = 0;
-  let license_status = 0;
-  let points = 0;
+  if (!documents || !Array.isArray(documents)) {
+    res.status(400).json({ error: 'Documents array required' });
+    return;
+  }
   
-  documents.forEach((doc: any) => {
-    if (doc.fields.birthdate) {
-      const birthDate = new Date(doc.fields.birthdate);
-      age = Math.floor((Date.now() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
-    }
-    
-    if (doc.fields.license_status === 'valid') {
-      license_status = 1;
-    }
-    
-    if (doc.fields.driving_points !== undefined) {
-      points = doc.fields.driving_points;
-    }
-  });
+  const phone = req.user?.phone;
+  if (!phone) {
+    res.status(401).json({ error: 'User not authenticated' });
+    return;
+  }
   
-  return res.json({ age, license_status, points });
+  const userData = await db.extractUserData(phone);
+  
+  res.json(userData);
 });

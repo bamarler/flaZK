@@ -9,6 +9,8 @@ import { authRouter } from './routes/auth.routes';
 import { documentRouter } from './routes/document.routes';
 import { proofRouter } from './routes/proof.routes';
 import { verificationRouter } from './routes/verification.routes';
+import { db } from './services/database.service';
+import { uploadService } from './services/upload.service';
 
 dotenv.config();
 
@@ -92,20 +94,32 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
 });
 
 const PORT = process.env.PORT || 3001;
-const server = app.listen(PORT, () => {
-  console.log(`
+
+async function startServer() {
+  await db.init();
+  console.log('✅ Database initialized');
+  
+  await uploadService.init();
+  console.log('✅ Upload service initialized');
+  
+  const server = app.listen(PORT, () => {
+    console.log(`
 🚀 flaZK API Server Started
 📍 Environment: ${process.env.NODE_ENV || 'development'}
 🔗 URL: http://localhost:${PORT}
 📁 Storage: ${path.join(__dirname, '../storage')}
-  `);
-});
-
-process.on('SIGTERM', () => {
-  console.log('SIGTERM signal received: closing HTTP server');
-  server.close(() => {
-    console.log('HTTP server closed');
+💾 Database: ${process.env.DB_PATH || path.join(__dirname, '../data/db.json')}
+    `);
   });
-});
+
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM signal received: closing HTTP server');
+    server.close(() => {
+      console.log('HTTP server closed');
+    });
+  });
+}
+
+startServer().catch(console.error);
 
 export default app;

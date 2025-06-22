@@ -1,21 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-
-interface VerificationRequest {
-  sessionId: string;
-  clientId: string;
-  clientName?: string;
-  callbackUrl: string;
-  requirements: {
-    age_min?: number;
-    license_status?: number;
-    points_max?: number;
-  };
-  createdAt: Date;
-  status: 'pending' | 'completed' | 'failed';
-}
-
-const verificationSessions = new Map<string, VerificationRequest>();
+import { db } from '../services/database.service';
 
 export const verificationController = {
   async createVerificationRequest(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -35,8 +20,9 @@ export const verificationController = {
 
       const sessionId = uuidv4();
 
-      const verificationRequest: VerificationRequest = {
+      await db.createSession({
         sessionId,
+        phone: '',
         clientId: client_id,
         clientName: req.client?.name,
         callbackUrl: callback_url,
@@ -47,9 +33,7 @@ export const verificationController = {
         },
         createdAt: new Date(),
         status: 'pending'
-      };
-
-      verificationSessions.set(sessionId, verificationRequest);
+      });
 
       const widgetUrl = new URL(process.env.WIDGET_URL || 'http://localhost:8081');
       widgetUrl.searchParams.append('session', sessionId);
@@ -91,7 +75,7 @@ export const verificationController = {
     try {
       const { sessionId } = req.params;
       
-      const session = verificationSessions.get(sessionId);
+      const session = await db.getSession(sessionId);
       
       if (!session) {
         res.status(404).json({
@@ -115,7 +99,7 @@ export const verificationController = {
       const { sessionId } = req.params;
       const { success, proof } = req.body;
       
-      const session = verificationSessions.get(sessionId);
+      const session = await db.getSession(sessionId);
       
       if (!session) {
         res.status(404).json({
@@ -124,7 +108,9 @@ export const verificationController = {
         return;
       }
       
-      session.status = success ? 'completed' : 'failed';
+      await db.updateSession(sessionId, {
+        status: success ? 'completed' : 'failed'
+      });
       
       const callbackUrl = new URL(session.callbackUrl);
       callbackUrl.searchParams.append('session', sessionId);
