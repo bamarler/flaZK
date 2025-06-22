@@ -1,4 +1,4 @@
-# flaZKFlaZK
+# flaZK
 
 ![alt text](image.png)
 
