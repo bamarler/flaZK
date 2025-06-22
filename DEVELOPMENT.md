@@ -2,6 +2,12 @@
 
 ## Quick Start
 
+### Setup
+
+```bash
+npm install
+```
+
 ### Demo
 
 ```bash
