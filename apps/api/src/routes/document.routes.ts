@@ -1,26 +1,29 @@
+// apps/api/src/routes/document.routes.ts
 import { Router } from 'express';
+import { authMiddleware } from '../middleware/auth.middleware';
 import { uploadMiddleware } from '../middleware/upload.middleware';
 
 export const documentRouter = Router();
 
-// Get user's saved documents
-documentRouter.get('/user/:userId', async (_req, res) => {
-  // Return user's saved documents
-  res.json({ documents: [] });
+// All document routes require authentication
+documentRouter.use(authMiddleware.validateJWT);
+
+// Now all routes are protected
+documentRouter.get('/user/:userId', async (req, res) => {
+  // Verify user can only access their own documents
+  if (req.params.userId !== req.user?.userId) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+  
+  return res.json({ documents: [] });
 });
 
-// Scan documents for requirements
-documentRouter.post('/scan', async (req, res) => {
-  const { userId, requirements } = req.body;
-  userId
-  requirements
-  // Return scan results
-  res.json({ 
-    age: true, 
-    license_status: false, 
-    points: true 
-  });
+documentRouter.post('/scan', authMiddleware.validateSession, async (_req, res) => {
+  // Additional session validation for verification flow
+  res.json({ age: true, license_status: false, points: true });
 });
+
+// ... other routes
 
 // Verify and save uploaded document
 documentRouter.post('/verify', 
