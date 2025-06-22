@@ -1,35 +1,32 @@
-// pages/ProofGeneration.tsx
 import { useState, useEffect } from 'react';
 import { Shield, Cpu, CheckCircle } from 'lucide-react';
 import { proofService, documentService, documentScannerService } from '../services';
 import type { ProofInput, ProofResult } from '../services/proof.service';
+import type { ExtractedData } from '../services/document-scanner.service';
 import type { VerificationRequest } from '../services/verification.service';
 
 interface ProofGenerationProps {
   request: VerificationRequest;
-  onComplete: (proof: ProofResult) => void;
+  onComplete: (proof: ProofResult, extractedData: ExtractedData) => void;
 }
 
 export function ProofGeneration({ request, onComplete }: ProofGenerationProps) {
   const [extracting, setExtracting] = useState(true);
   const [generating, setGenerating] = useState(false);
-  const [extractedData, setExtractedData] = useState<any>(null);
+  const [extractedData, setExtractedData] = useState<ExtractedData | null>(null);
 
   useEffect(() => {
     generateProof();
   }, []);
 
   const generateProof = async () => {
-    // Step 1: Extract data from temporary documents
     const tempDocs = documentService.getTemporaryDocuments();
     const extracted = await documentScannerService.extractDataFromDocuments(tempDocs);
     setExtractedData(extracted);
     setExtracting(false);
     
-    // Step 2: Clear temporary storage
     documentService.clearTemporary();
     
-    // Step 3: Merge with requirements
     const proofInput: ProofInput = {
       age: extracted.age,
       license_status: extracted.license_status,
@@ -38,13 +35,11 @@ export function ProofGeneration({ request, onComplete }: ProofGenerationProps) {
       points_max: request.requirements.points_max || 6
     };
     
-    // Step 4: Generate proof
     setGenerating(true);
     const proofResult = await proofService.generateProof(proofInput);
     
-    // Step 5: Complete
     setTimeout(() => {
-      onComplete(proofResult);
+      onComplete(proofResult, extracted);
     }, 1000);
   };
 
@@ -55,7 +50,6 @@ export function ProofGeneration({ request, onComplete }: ProofGenerationProps) {
       </h2>
 
       <div className="space-y-4">
-        {/* Extracting data step */}
         <div
           className={`p-4 rounded-lg border-2 transition-all ${
             extracting
@@ -78,7 +72,6 @@ export function ProofGeneration({ request, onComplete }: ProofGenerationProps) {
           </div>
         </div>
 
-        {/* Generating proof step */}
         <div
           className={`p-4 rounded-lg border-2 transition-all ${
             !extracting && generating

@@ -1,4 +1,3 @@
-// App.tsx
 import { useState, useEffect } from 'react';
 import { Shield } from 'lucide-react';
 import { Login } from './pages/Login';
@@ -9,6 +8,7 @@ import { ScenarioSelector } from './components/ScenarioSelector';
 import { verificationService, authService } from './services';
 import type { VerificationRequest } from './services/verification.service';
 import type { ProofResult } from './services/proof.service';
+import type { ExtractedData } from './services/document-scanner.service';
 
 export type Step = 'login' | 'scan' | 'generate' | 'results';
 
@@ -17,9 +17,9 @@ export function App() {
   const [verificationRequest, setVerificationRequest] = useState<VerificationRequest | null>(null);
   const [userId, setUserId] = useState<string>('');
   const [proofResult, setProofResult] = useState<ProofResult | null>(null);
+  const [extractedData, setExtractedData] = useState<ExtractedData | null>(null);
 
   useEffect(() => {
-    // Parse verification request from URL
     const params = new URLSearchParams(window.location.search);
     const request = verificationService.parseVerificationRequest(params);
     setVerificationRequest(request);
@@ -36,8 +36,9 @@ export function App() {
     setCurrentStep('generate');
   };
 
-  const handleProofGenerated = (proof: ProofResult) => {
+  const handleProofGenerated = (proof: ProofResult, extracted: ExtractedData) => {
     setProofResult(proof);
+    setExtractedData(extracted);
     setCurrentStep('results');
   };
 
@@ -54,11 +55,9 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-gradient-main flex items-center justify-center p-4">
-      {/* Scenario Selector for Development */}
       <ScenarioSelector />
       
       <div className="w-full max-w-md">
-        {/* Header */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center gap-3 mb-2">
             <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center">
@@ -71,7 +70,6 @@ export function App() {
           </p>
         </div>
 
-        {/* Progress indicator */}
         <div className="flex justify-center mb-6">
           <div className="flex items-center gap-2">
             {steps.map((step, index) => (
@@ -97,7 +95,6 @@ export function App() {
           </div>
         </div>
 
-        {/* Main Card */}
         <div className="card">
           {currentStep === 'login' && (
             <Login 
@@ -122,15 +119,15 @@ export function App() {
             />
           )}
 
-          {currentStep === 'results' && proofResult && (
+          {currentStep === 'results' && proofResult && extractedData && (
             <Results
               proof={proofResult}
               request={verificationRequest}
+              extractedData={extractedData}
             />
           )}
         </div>
 
-        {/* Footer */}
         <div className="mt-6 text-center">
           <p className="text-xs text-gray-500">
             Secured by zero-knowledge proofs

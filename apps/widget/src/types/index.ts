@@ -6,7 +6,7 @@ export interface UserDocument {
     fields: Record<string, any>;
   }
   
-  export interface User {
+export interface User {
     userId: string;
     phone: string;
   }
