@@ -1,0 +1,12 @@
+{
+    "extends": "@flazk/shared/tsconfig.base.json",
+    "compilerOptions": {
+      "jsx": "react-jsx",
+      "baseUrl": "./src",
+      "paths": {
+        "@/*": ["./*"]
+      }
+    },
+    "include": ["src"],
+    "exclude": ["node_modules", "dist"]
+}

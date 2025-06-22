@@ -1,0 +1,1 @@
+module.exports = require('@flazk/shared/postcss.config');
