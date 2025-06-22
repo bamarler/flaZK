@@ -1,6 +1,6 @@
 pragma circom 2.0.0;
 
-// --- 8-bit GreaterEq Comparator (for age check) ---
+// --- 8-bit GreaterEq Comparator ---
 template GreaterEq8() {
     signal input a;
     signal input b;
@@ -30,8 +30,29 @@ template IsOne() {
     out <== in;
 }
 
-// --- LessThan Comparator for points (threshold < 16) ---
-template LessThan6_4bit() {
+// --- 8-bit LessThan Comparator ---
+template LessThan8() {
+    signal input a;
+    signal input b;
+    signal output out;
+
+    signal diff;
+    diff <== b - a;
+
+    // Bit decomposition (8 bits)
+    signal bits[8];
+    var i;
+    var sum = 0;
+    for (i = 0; i < 8; i++) {
+        bits[i] <-- (diff >> i) & 1;
+        sum += bits[i] * (1 << i);
+    }
+    diff === sum;
+    // If diff > 0, the sign bit (bits[7]) is 0 and diff != 0
+    signal is_nonzero;
+    is_nonzero <== diff != 0;
+    out <== (1 - bits[7]) * is_nonzero;
+}
     signal input in;            // points
     signal output out;
 
@@ -80,12 +101,13 @@ template LessThan6_4bit() {
     out <== eq[0] + eq[1] + eq[2] + eq[3] + eq[4] + eq[5];
 }
 
-// --- Main CarRentalEligibility circuit ---
-template CarRentalEligibility() {
+// --- Main EligibilityCheck circuit ---
+template EligibilityCheck() {
     signal input age;
     signal input license_status;
     signal input points;
-    signal input age_threshold;
+    signal input age_min;
+    signal input points_max;
 
     signal output age_ok;
     signal output license_ok;
@@ -94,15 +116,16 @@ template CarRentalEligibility() {
 
     component agecheck = GreaterEq8();
     agecheck.a <== age;
-    agecheck.b <== age_threshold;
+    agecheck.b <== age_min;
     age_ok <== agecheck.out;
 
     component lic = IsOne();
     lic.in <== license_status;
     license_ok <== lic.out;
 
-    component pointscheck = LessThan6_4bit();
-    pointscheck.in <== points;
+    component pointscheck = LessThan8();
+    pointscheck.a <== points;
+    pointscheck.b <== points_max;
     points_ok <== pointscheck.out;
 
     signal tmp;
@@ -110,4 +133,4 @@ template CarRentalEligibility() {
     isEligible <== tmp * points_ok;
 }
 
-component main = CarRentalEligibility();
+component main = EligibilityCheck();

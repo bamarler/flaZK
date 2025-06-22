@@ -27,9 +27,9 @@ status "Preparing Phase 2 Powers of Tau file..."
 snarkjs powersoftau prepare phase2 pot12_final.ptau pot12_final_phase2.ptau -v || { err "Failed at powersoftau prepare phase2"; exit 1; }
 
 status "Generating proving and verifying keys..."
-snarkjs groth16 setup build/CarRentalEligibility.r1cs pot12_final_phase2.ptau build/CarRentalEligibility.zkey || { err "Failed at groth16 setup"; exit 1; }
+snarkjs groth16 setup build/EligibilityCheck.r1cs pot12_final_phase2.ptau build/EligibilityCheck.zkey || { err "Failed at groth16 setup"; exit 1; }
 status "Exporting verification key..."
-snarkjs zkey export verificationkey build/CarRentalEligibility.zkey build/carrental_all_verification_key.json || { err "Failed at zkey export verificationkey"; exit 1; }
+snarkjs zkey export verificationkey build/EligibilityCheck.zkey build/eligibility_check_verification_key.json || { err "Failed at zkey export verificationkey"; exit 1; }
 
 ok "\nTrusted setup complete! Files created:"
-ls -lh build/CarRentalEligibility.zkey build/carrental_all_verification_key.json
+ls -lh build/EligibilityCheck.zkey build/eligibility_check_verification_key.json
