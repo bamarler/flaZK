@@ -78,9 +78,9 @@ The API comes with pre-seeded test users and documents:
 
 ### Test Users
 
-- **Phone**: +15555551234 (Has all documents)
-- **Phone**: +15555552345 (Missing driving record)
-- **Phone**: +15555553456 (Missing license and driving record)
+- **Phone**: 5555551234 (Has all documents)
+- **Phone**: 5555552345 (Missing driving record)
+- **Phone**: 5555553456 (Missing license and driving record)
 
 ### Verification Code
 

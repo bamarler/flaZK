@@ -85,7 +85,7 @@
                     const isValid = validateProof(result.proof);
                     
                     if (isValid) {
-                        updateStatus('success', '<strong>✅ Verification Complete</strong><br>You are eligible to rent a vehicle.<br><small>Proof: ' + result.proof.substring(0, 10) + '...</small>');
+                        updateStatus('success', '<strong>✅ Verification Complete</strong><br>You are eligible to rent a vehicle.<br>');
                     } else {
                         updateStatus('error', '<strong>❌ Verification Error</strong><br>Invalid proof received.');
                     }
