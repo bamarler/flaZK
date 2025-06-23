@@ -12,7 +12,8 @@ FlaZK eliminates this tradeoff by providing cryptographic age and license verifi
 
 ## How It Works
 
-{:format :pointed-dict, :data [{#uuid "8284094e-ceb4-40df-80b3-a2c64afb81f1" {:entity-type :block, :coords {:y-start 0.17677346996437526, :x-start 0.05171086730497664, :x-end 0.7166061560858468, :y-end 0.7170875443743289}, :original-aspect-ratio? true, :media-asset-ids #{#uuid "80f306fc-0b71-4703-9add-ffa3432966e4"}, :image-aspect-ratio 2.187683284457478, :url "https://pitch-assets-ccb95893-de3f-4266-973c-20049231b248.s3.eu-west-1.amazonaws.com/80f306fc-0b71-4703-9add-ffa3432966e4?pitch-bytes=94850&pitch-content-type=image%2Fpng", :block-type :image, :image-scale-x 1, :locked-aspect-ratio? false, :created-at 1750569592061}} [#uuid "8284094e-ceb4-40df-80b3-a2c64afb81f1"]]}
+![image](https://github.com/user-attachments/assets/0b14bbba-1f20-47b7-994a-794d139ea371)
+
 
 A platform requests proof using a simple JSON policy (e.g., { "age_min": 25, "license_status": 1, "points_max": 6 }).
 
