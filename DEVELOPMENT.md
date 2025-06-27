@@ -15,6 +15,7 @@ npm run dev:demo
 ```
 
 - Runs the API and simple demo site to request proof
+- The demo site is at http://localhost:8080
 
 ### Full Stack Development
 
@@ -26,6 +27,7 @@ npm run dev:full
 - Real backend integration
 - Uses local file storage
 - Includes pre-seeded test data
+- The widget is at http://localhost:5173
 
 ### Mock Development (Recommended for UI work)
 
@@ -37,6 +39,7 @@ npm run dev:mocks
 - No backend required
 - Fastest startup
 - Perfect for UI/UX development
+- The widget is at http://localhost:5173
 
 ### API Only
 
@@ -59,6 +62,8 @@ npm run dev:widget
 
 - Separate terminals for each service
 - Better for debugging
+- The api is at http://localhost:3001
+- The widget is at http://localhost:5173
 
 ## Environment Variables
 
