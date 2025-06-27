@@ -12,6 +12,9 @@ FlaZK eliminates this tradeoff by providing cryptographic age and license verifi
 
 ## How It Works
 
+![image](https://github.com/user-attachments/assets/0b14bbba-1f20-47b7-994a-794d139ea371)
+
+
 A platform requests proof using a simple JSON policy (e.g., { "age_min": 25, "license_status": 1, "points_max": 6 }).
 
 The user logs in with a phone number and uploads existing documents (e.g., license, insurance).
